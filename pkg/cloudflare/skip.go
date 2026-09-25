@@ -7,6 +7,10 @@ import "time"
 // threshold, in which case obtaining a new certificate can be skipped. It
 // never skips when no certificate is configured yet.
 func ShouldSkipRenewal(cf CloudflareClient, threshold time.Duration) (bool, error) {
+	if threshold == 0 {
+		return false, nil
+	}
+
 	expiresOn, err := cf.GetCertificateExpiry()
 	if err != nil {
 		return false, err
