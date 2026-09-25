@@ -31,6 +31,16 @@ envFrom: []
 
 resources: {}
 
+# Additional volumes on the job pod, e.g. for mounting a CA bundle or a writable /tmp.
+volumes: []
+# - name: tmp
+#   emptyDir: {}
+
+# Additional volumeMounts on the job container.
+volumeMounts: []
+# - name: tmp
+#   mountPath: /tmp
+
 serviceAccount:
   create: false
   annotations: {}
