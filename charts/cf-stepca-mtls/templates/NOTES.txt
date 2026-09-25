@@ -1,0 +1,7 @@
+{{ include "cf-stepca-mtls.fullname" . }} deployed as CronJob with schedule "{{ .Values.cronjob.schedule }}".
+
+Check status:
+  kubectl get cronjob {{ include "cf-stepca-mtls.fullname" . }} -n {{ .Release.Namespace }}
+
+Trigger a run manually:
+  kubectl create job --from=cronjob/{{ include "cf-stepca-mtls.fullname" . }} {{ include "cf-stepca-mtls.fullname" . }}-manual -n {{ .Release.Namespace }}

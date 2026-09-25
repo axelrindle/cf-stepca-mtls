@@ -1,0 +1,11 @@
+apiVersion: v2
+
+name: cf-stepca-mtls
+description: |
+  Cloudflare <> Step CA mTLS automation
+
+  Automatically deploys mTLS certificates to Cloudflare issued by Step CA.
+
+type: application
+version: 1.0.0
+appVersion: 1.0.0

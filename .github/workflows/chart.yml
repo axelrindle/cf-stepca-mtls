@@ -1,0 +1,76 @@
+name: Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  CHART_DIR: charts/cf-stepca-mtls
+
+jobs:
+  readme:
+    name: 📝 Generate README
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      commit_sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Generate README.md
+        uses: losisin/helm-docs-github-action@v2
+        with:
+          chart-search-root: charts
+          git-push: ${{ github.event_name == 'push' }}
+          git-commit-message: "docs(chart): update README.md"
+          fail-on-diff: ${{ github.event_name == 'pull_request' }}
+
+      - name: Resolve commit SHA
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: 📦 Publish Chart
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs:
+      - readme
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.readme.outputs.commit_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
+      - name: Login to container registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Package chart
+        run: helm package "${{ env.CHART_DIR }}" --destination dist
+
+      - name: Push chart
+        run: |
+          chart_version=$(helm show chart "${{ env.CHART_DIR }}" | grep '^version:' | awk '{print $2}')
+          helm push "dist/cf-stepca-mtls-${chart_version}.tgz" "oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts"

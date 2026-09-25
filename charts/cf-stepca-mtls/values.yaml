@@ -1,0 +1,56 @@
+image:
+  repository: ghcr.io/axelrindle/cf-stepca-mtls
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+
+cronjob:
+  # Approximation for a ~60 day interval: runs on the 1st of every 2nd month.
+  # Standard cron cannot express an exact 60-day period since month lengths vary.
+  schedule: "0 3 1 */2 *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  backoffLimit: 3
+  restartPolicy: OnFailure
+
+# Generic env passthrough for the job container, e.g.:
+# env:
+#   - name: STEP_CA_URL
+#     value: https://ca.example.com
+#   - name: STEP_CA_TOKEN
+#     valueFrom:
+#       secretKeyRef:
+#         name: cf-stepca-mtls
+#         key: token
+env: []
+
+envFrom: []
+
+resources: {}
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,55 @@
+version: '3'
+
+vars:
+  INPUT_FILE: ./cmd/mtls
+  OUTPUT_DIRECTORY: dist
+  OUTPUT_FILE_NAME: mtls
+  OUTPUT_FILE_SUFFIX:
+  APP_VERSION:
+    sh: git describe --tags --always --abbrev=0 || echo "0.0.0"
+  APP_COMMIT_HASH:
+    sh: git rev-parse --short HEAD || echo "abcdef1234567890"
+  APP_BUILD_TIMESTAMP:
+    sh: date '+%Y-%m-%dT%H:%M:%S'
+  IMAGE_NAME: cf-stepca-mtls
+
+tasks:
+  default:
+    cmd:
+      task: build
+
+  clean:
+    cmd: rm -rf "{{.OUTPUT_DIRECTORY}}/"
+    silent: true
+
+  build:
+    env:
+      CGO_ENABLED: "0" # required for full static linking
+      GOOS: linux
+    vars:
+      ABS: "{{.OUTPUT_DIRECTORY}}/{{.OUTPUT_FILE_NAME}}{{.OUTPUT_FILE_SUFFIX}}"
+      LDFLAGS: "-X 'main.Version={{.APP_VERSION}}' -X 'main.CommitHash={{.APP_COMMIT_HASH}}' -X 'main.BuildTimestamp={{.APP_BUILD_TIMESTAMP}}'"
+    sources:
+      - "**/*.go"
+    generates:
+      - "{{.ABS}}"
+    cmds:
+      - |
+        go build -v \
+          -ldflags="-w -s {{.LDFLAGS}}" \
+          -o "{{.ABS}}" \
+          "{{.INPUT_FILE}}"
+
+  test:
+    cmd: go test -v -cover -coverprofile=coverage.out ./...
+
+  start:
+    cmd: go run "{{.INPUT_FILE}}"
+    dotenv:
+      - .env
+
+  docker:
+    deps:
+      - task: build
+    cmds:
+      - cmd: docker build . -t "{{.IMAGE_NAME}}"
