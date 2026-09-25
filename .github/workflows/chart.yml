@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "*.*.*"
     paths:
       - "charts/**"
   pull_request:
@@ -69,19 +67,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Resolve chart version
-        id: version
-        run: |
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            version=$(helm show chart "${{ env.CHART_DIR }}" | grep '^version:' | awk '{print $2}')
-          else
-            version=latest
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
       - name: Package chart
-        run: helm package "${{ env.CHART_DIR }}" --destination dist --version "${{ steps.version.outputs.version }}"
+        run: helm package "${{ env.CHART_DIR }}" --destination dist
 
       - name: Push chart
         run: |
-          helm push "dist/cf-stepca-mtls-${{ steps.version.outputs.version }}.tgz" "oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts"
+          chart_version=$(helm show chart "${{ env.CHART_DIR }}" | grep '^version:' | awk '{print $2}')
+          helm push "dist/cf-stepca-mtls-${chart_version}.tgz" "oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts"
