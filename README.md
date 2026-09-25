@@ -28,10 +28,10 @@ The image is based on `distroless/static-debian13:nonroot` and runs as a non-roo
 
 ### Kubernetes
 
-The bundled Helm chart at [charts/cf-stepca-mtls](charts/cf-stepca-mtls) deploys the tool as a `CronJob`:
+The bundled Helm chart at [charts/cf-stepca-mtls](charts/cf-stepca-mtls) deploys the tool as a `CronJob`. It is published as an OCI artifact to GHCR:
 
 ```sh
-helm install cf-stepca-mtls ./charts/cf-stepca-mtls \
+helm install cf-stepca-mtls oci://ghcr.io/axelrindle/charts/cf-stepca-mtls \
   --set env[0].name=STEP_API_ENDPOINT \
   --set env[0].value=https://ca.example.com
 ```
