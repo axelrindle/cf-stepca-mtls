@@ -97,6 +97,9 @@ jobs:
           name: binary-${{ matrix.arch }}
           path: dist/
 
+      - name: Normalize binary name
+        run: mv "dist/mtls-${{ github.ref_name }}-${{ matrix.arch }}" dist/mtls
+
       - name: List files
         run: tree
 
