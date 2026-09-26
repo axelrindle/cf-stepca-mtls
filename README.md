@@ -44,18 +44,18 @@ Configuration is done entirely via environment variables.
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `APP_LOGGING_LEVEL` | no | `info` | Log level (`debug`, `info`, `warn`, `error`) |
-| `APP_ENVIRONMENT` | no | `production` | `production` or `development` |
-| `APP_NOTIFY_TARGETS` | no | - | Notification targets [supported by shoutrrr](https://shoutrrr.nickfedor.com/v0.21.1/services/overview/) |
-| `APP_NOTIFY_TEMPLATE` | no | `Cloudflare mTLS certificate updated for zone {{.ZoneID}} with expiry after {{.NotAfter}}"` | Notification message template. [See below](#notifications) for more information. |
-| `STEP_API_ENDPOINT` | yes | - | URL of the Step CA API |
-| `STEP_CERTIFICATE_PROVISIONER` | yes | - | Name of the Step CA provisioner |
-| `STEP_CERTIFICATE_PROVISIONER_PASSWORD` | yes | - | Password of the provisioner |
-| `STEP_CERTIFICATE_SUBJECT` | yes | - | Subject/CN of the certificate to issue |
-| `STEP_CERTIFICATE_LIFETIME` | no | `24h` | Validity, either as a duration (`24h`) or an RFC 3339 timestamp |
-| `CF_API_TOKEN` | yes | - | Cloudflare API token with `Zone SSL and Certificates Read/Write` permission |
-| `CF_ZONE_ID` | yes | - | ID of the Cloudflare zone |
-| `CF_RENEWAL_THRESHOLD` | no | `168h` | Minimum remaining validity below which renewal triggers |
+| APP_ENVIRONMENT | no | production | `development` should only be used in local development; |
+| APP_LOGGING_LEVEL | no | info | Log level (`debug`, `info`, `warn`, `error`); |
+| APP_NOTIFY_TARGETS | no | [] | Notification targets [supported by shoutrrr](https://shoutrrr.nickfedor.com/v0.21.1/services/overview/); |
+| APP_NOTIFY_TEMPLATE | no | Cloudflare mTLS certificate updated for zone {{.ZoneID}} with expiry after {{.NotAfter}} | Notification message template. [See below](#notifications) for more information.; |
+| **CF_API_TOKEN** | **yes** | - | Cloudflare API token with the following permissions:; - Zone SSL and Certificates Read/Write; |
+| CF_RENEWAL_THRESHOLD | no | 168h | Minimum remaining validity below which renewal triggers; |
+| **CF_ZONE_ID** | **yes** | - | ID of the Cloudflare zone; Can be copied on the zone dashboard; |
+| **STEP_API_ENDPOINT** | **yes** | - | URL of the Step CA instance; |
+| STEP_CERTIFICATE_LIFETIME | no | 24h | Either a duration string (e.g. "24h") or an RFC 3339; timestamp, applied as the certificate's NotAfter.; |
+| **STEP_CERTIFICATE_PROVISIONER** | **yes** | - | Name of the Step CA provisioner; |
+| **STEP_CERTIFICATE_PROVISIONER_PASSWORD** | **yes** | - | Password of the provisioner; |
+| **STEP_CERTIFICATE_SUBJECT** | **yes** | - | Subject/CN of the certificate to issue; |
 
 ## Notifications
 
