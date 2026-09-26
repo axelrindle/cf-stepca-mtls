@@ -30,11 +30,17 @@ type cloudflareConfig struct {
 	RenewalThreshold time.Duration `env:"CF_RENEWAL_THRESHOLD" default:"168h"`
 }
 
+type notifyConfig struct {
+	Targets  []string `env:"APP_NOTIFY_TARGETS" envSeparator:"\n" default:"[]"`
+	Template string   `env:"APP_NOTIFY_TEMPLATE" default:"Cloudflare mTLS certificate updated for zone {{.ZoneID}} with expiry after {{.NotAfter}}"`
+}
+
 type Config struct {
 	Logging     loggingConfig     `default:""`
 	Api         apiConfig         `default:""`
 	Certificate certificateConfig `default:""`
 	Cloudflare  cloudflareConfig  `default:""`
+	Notify      notifyConfig      `default:""`
 
 	Environment string `env:"APP_ENVIRONMENT" default:"production" validate:"oneof=production development"`
 }

@@ -5,11 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
+	"text/template"
 
 	"charm.land/log/v2"
 	"github.com/axelrindle/cf-stepca-mtls/internal/config"
 	"github.com/axelrindle/cf-stepca-mtls/pkg/cloudflare"
 	"github.com/axelrindle/cf-stepca-mtls/pkg/stepca"
+	"github.com/lithammer/dedent"
+	"github.com/nicholas-fedor/shoutrrr"
+	"github.com/nicholas-fedor/shoutrrr/pkg/types"
 )
 
 //go:embed banner.txt
@@ -46,6 +51,32 @@ func main() {
 
 	log.SetLevel(cfg.CharmLoggerLevel())
 
+	notify, err := shoutrrr.NewSenderWithOptions(log.StandardLog(), types.SenderOptions{}, cfg.Notify.Targets...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tpl, err := template.New("shoutrrr").Parse(cfg.Notify.Template)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	msg := &strings.Builder{}
+	tplData := map[string]any{
+		"NotAfter": "foo bar",
+		"Subject":  cfg.Certificate.Subject,
+		"ZoneID":   cfg.Cloudflare.ZoneID,
+	}
+	if err := tpl.Execute(msg, tplData); err != nil {
+		log.Error("notification template failed", err)
+	} else {
+		errs := notify.Send(dedent.Dedent(msg.String()), nil)
+		for _, err := range errs {
+			log.Error("send notification failed", err)
+		}
+	}
+	return
+
 	cf := cloudflare.NewClient(cfg.Cloudflare.Token, cfg.Cloudflare.ZoneID)
 
 	skip, err := cloudflare.ShouldSkipRenewal(cf, cfg.Cloudflare.RenewalThreshold)
@@ -71,4 +102,19 @@ func main() {
 	if err := cf.DeployCertificate(cert); err != nil {
 		log.Fatal(err)
 	}
+
+	// msg := &strings.Builder{}
+	// tplData := map[string]any{
+	// 	"NotAfter": cert.NotAfter.UTC().Format(time.RFC1123),
+	// 	"Subject":  cfg.Certificate.Subject,
+	// 	"ZoneID":   cfg.Cloudflare.ZoneID,
+	// }
+	// if err := tpl.Execute(msg, tplData); err != nil {
+	// 	log.Error("notification template failed", err)
+	// } else {
+	// 	errs := notify.Send(dedent.Dedent(msg.String()), nil)
+	// 	for _, err := range errs {
+	// 		log.Error("send notification failed", err)
+	// 	}
+	// }
 }

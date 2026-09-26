@@ -59,7 +59,8 @@ func (c client) RequestCertificate(subject, lifetime string) (*Certificate, erro
 
 	log.Info("certificate obtained", "subject", subject)
 	return &Certificate{
-		CrtPEM: crtPEM,
-		KeyPEM: pem.EncodeToMemory(keyBlock),
+		CrtPEM:   crtPEM,
+		KeyPEM:   pem.EncodeToMemory(keyBlock),
+		NotAfter: notAfter.Time(),
 	}, nil
 }

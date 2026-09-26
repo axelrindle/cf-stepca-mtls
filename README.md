@@ -46,6 +46,8 @@ Configuration is done entirely via environment variables.
 | --- | --- | --- | --- |
 | `APP_LOGGING_LEVEL` | no | `info` | Log level (`debug`, `info`, `warn`, `error`) |
 | `APP_ENVIRONMENT` | no | `production` | `production` or `development` |
+| `APP_NOTIFY_TARGETS` | no | - | Notification targets [supported by shoutrrr](https://shoutrrr.nickfedor.com/v0.21.1/services/overview/) |
+| `APP_NOTIFY_TEMPLATE` | no | `Cloudflare mTLS certificate updated for zone {{.ZoneID}} with expiry after {{.NotAfter}}"` | Notification message template. [See below](#notifications) for more information. |
 | `STEP_API_ENDPOINT` | yes | - | URL of the Step CA API |
 | `STEP_CERTIFICATE_PROVISIONER` | yes | - | Name of the Step CA provisioner |
 | `STEP_CERTIFICATE_PROVISIONER_PASSWORD` | yes | - | Password of the provisioner |
@@ -54,6 +56,17 @@ Configuration is done entirely via environment variables.
 | `CF_API_TOKEN` | yes | - | Cloudflare API token with `Zone SSL and Certificates Read/Write` permission |
 | `CF_ZONE_ID` | yes | - | ID of the Cloudflare zone |
 | `CF_RENEWAL_THRESHOLD` | no | `168h` | Minimum remaining validity below which renewal triggers |
+
+## Notifications
+
+Notifications can be sent on successful certificate deployment. The sent message is a [go text template](https://pkg.go.dev/text/template)
+with support for the following variables:
+
+| Variable | Description |
+| --- | --- |
+| `NotAfter` | RFC 1123 formatted time string indicating the certificate expiry timestamp in UTC |
+| `Subject` | The certificate subject |
+| `ZoneID` | Cloudflare Zone ID |
 
 ## Thank you!
 
