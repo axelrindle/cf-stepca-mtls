@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"iter"
 	"os"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
@@ -68,43 +69,51 @@ type fieldDocs map[string]map[string]string
 // parseFieldDocs parses all Go files in dir and returns the doc comment of
 // every struct field, keyed by struct type name and then field name.
 func parseFieldDocs(dir string) (fieldDocs, error) {
-	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
 
+	fset := token.NewFileSet()
 	docs := make(fieldDocs)
 
-	for _, pkg := range pkgs {
-		for _, file := range pkg.Files {
-			for _, decl := range file.Decls {
-				gen, ok := decl.(*ast.GenDecl)
-				if !ok || gen.Tok != token.TYPE {
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+
+		file, err := parser.ParseFile(fset, filepath.Join(dir, name), nil, parser.ParseComments)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, decl := range file.Decls {
+			gen, ok := decl.(*ast.GenDecl)
+			if !ok || gen.Tok != token.TYPE {
+				continue
+			}
+
+			for _, spec := range gen.Specs {
+				ts, ok := spec.(*ast.TypeSpec)
+				if !ok {
+					continue
+				}
+				st, ok := ts.Type.(*ast.StructType)
+				if !ok {
 					continue
 				}
 
-				for _, spec := range gen.Specs {
-					ts, ok := spec.(*ast.TypeSpec)
-					if !ok {
+				fieldDocs := make(map[string]string)
+				for _, field := range st.Fields.List {
+					if field.Doc == nil || len(field.Names) == 0 {
 						continue
 					}
-					st, ok := ts.Type.(*ast.StructType)
-					if !ok {
-						continue
-					}
-
-					fieldDocs := make(map[string]string)
-					for _, field := range st.Fields.List {
-						if field.Doc == nil || len(field.Names) == 0 {
-							continue
-						}
-						text := strings.TrimSpace(strings.ReplaceAll(field.Doc.Text(), "\n", "; "))
-						fieldDocs[field.Names[0].Name] = text
-					}
-
-					docs[ts.Name.Name] = fieldDocs
+					text := strings.TrimSpace(strings.ReplaceAll(field.Doc.Text(), "\n", "; "))
+					fieldDocs[field.Names[0].Name] = text
 				}
+
+				docs[ts.Name.Name] = fieldDocs
 			}
 		}
 	}
