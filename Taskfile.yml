@@ -53,3 +53,7 @@ tasks:
       - task: build
     cmds:
       - cmd: docker build . -t "{{.IMAGE_NAME}}"
+
+  docs:readme:
+    desc: Render README.md from README.md.tmpl using the current config docs
+    cmd: go run ./cmd/docs
