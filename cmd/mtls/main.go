@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 
 	"charm.land/log/v2"
 	"github.com/axelrindle/cf-stepca-mtls/internal/config"
@@ -61,22 +62,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	msg := &strings.Builder{}
-	tplData := map[string]any{
-		"NotAfter": "foo bar",
-		"Subject":  cfg.Certificate.Subject,
-		"ZoneID":   cfg.Cloudflare.ZoneID,
-	}
-	if err := tpl.Execute(msg, tplData); err != nil {
-		log.Error("notification template failed", err)
-	} else {
-		errs := notify.Send(dedent.Dedent(msg.String()), nil)
-		for _, err := range errs {
-			log.Error("send notification failed", err)
-		}
-	}
-	return
-
 	cf := cloudflare.NewClient(cfg.Cloudflare.Token, cfg.Cloudflare.ZoneID)
 
 	skip, err := cloudflare.ShouldSkipRenewal(cf, cfg.Cloudflare.RenewalThreshold)
@@ -103,18 +88,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// msg := &strings.Builder{}
-	// tplData := map[string]any{
-	// 	"NotAfter": cert.NotAfter.UTC().Format(time.RFC1123),
-	// 	"Subject":  cfg.Certificate.Subject,
-	// 	"ZoneID":   cfg.Cloudflare.ZoneID,
-	// }
-	// if err := tpl.Execute(msg, tplData); err != nil {
-	// 	log.Error("notification template failed", err)
-	// } else {
-	// 	errs := notify.Send(dedent.Dedent(msg.String()), nil)
-	// 	for _, err := range errs {
-	// 		log.Error("send notification failed", err)
-	// 	}
-	// }
+	msg := &strings.Builder{}
+	tplData := map[string]any{
+		"NotAfter": cert.NotAfter.UTC().Format(time.RFC1123),
+		"Subject":  cfg.Certificate.Subject,
+		"ZoneID":   cfg.Cloudflare.ZoneID,
+	}
+	if err := tpl.Execute(msg, tplData); err != nil {
+		log.Error("notification template failed", err)
+	} else {
+		errs := notify.Send(dedent.Dedent(msg.String()), nil)
+		for _, err := range errs {
+			log.Error("send notification failed", err)
+		}
+	}
 }
