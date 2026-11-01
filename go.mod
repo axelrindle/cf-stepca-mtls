@@ -5,7 +5,7 @@ go 1.27
 require (
 	charm.land/log/v2 v2.0.1
 	github.com/caarlos0/env/v11 v11.4.1
-	github.com/cloudflare/cloudflare-go/v7 v7.11.0
+	github.com/cloudflare/cloudflare-go/v7 v7.13.1
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/lithammer/dedent v1.1.0
 	github.com/nicholas-fedor/shoutrrr v0.21.1
