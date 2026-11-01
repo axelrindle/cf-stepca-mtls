@@ -101,8 +101,8 @@ github.com/clipperhouse/displaywidth v0.11.0 h1:lBc6kY44VFw+TDx4I8opi/EtL9m20WSE
 github.com/clipperhouse/displaywidth v0.11.0/go.mod h1:bkrFNkf81G8HyVqmKGxsPufD3JhNl3dSqnGhOoSD/o0=
 github.com/clipperhouse/uax29/v2 v2.7.0 h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk=
 github.com/clipperhouse/uax29/v2 v2.7.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJSwu5BF98AuoVM=
-github.com/cloudflare/cloudflare-go/v7 v7.11.0 h1:haUt51prTC03PcorFOvhlWj9q58XCIk1jTbRtXJKQrI=
-github.com/cloudflare/cloudflare-go/v7 v7.11.0/go.mod h1:9zcoIAtu6cmcoPszCNISvqYMXs8wObtVGXE1qGFMrNU=
+github.com/cloudflare/cloudflare-go/v7 v7.13.1 h1:fRe8JpKifizF3WafGmTQiI5+lNVZht/khSDL2g9KrOs=
+github.com/cloudflare/cloudflare-go/v7 v7.13.1/go.mod h1:nHsJfu5TjVpYVJVpmRhB4WJ6Dd91fckUGgw5t9fKe54=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
 github.com/coreos/go-etcd v2.0.0+incompatible/go.mod h1:Jez6KQU2B/sWsbdaef3ED8NzMklzPG4d5KIOhIy30Tk=
 github.com/coreos/go-oidc/v3 v3.17.0 h1:hWBGaQfbi0iVviX4ibC7bk8OKT5qNr4klBaCHVNvehc=
